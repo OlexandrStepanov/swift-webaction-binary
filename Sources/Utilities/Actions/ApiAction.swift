@@ -64,14 +64,14 @@ public class ApiAction {
         
         requestArgs = args
         
-        if let method = args["__ow_meta_verb"] as? String {
+        if let method = args["__ow_method"] as? String {
             requestMethod = HTTPMethod(rawValue: method) ?? .unknown
         }
         else {
-            log("__ow_meta_verb is not set")
+            log("__ow_method is not set")
             requestMethod = .unknown
         }
-        requestHeaders = args["__ow_meta_headers"] as? [String : String] ?? [:]
+        requestHeaders = args["__ow_headers"] as? [String : String] ?? [:]
         
         //  Default response is success with empty JSON
         responseJSON = [:]
@@ -89,7 +89,7 @@ public class ApiAction {
             return
         }
         
-        let result: [String : Any] = [ "body": base64_body, "code": responseCode, "headers": responseHeaders ]
+        let result: [String : Any] = [ "body": base64_body, "statusCode": responseCode, "headers": responseHeaders ]
         if let respString = JSONUtils.dictionaryToJsonString(jsonDict: result) {
             print("\(respString)")
         } else {
@@ -127,7 +127,7 @@ public extension ApiAction {
     ///
     /// - Returns: true if check passed, and false otherwise
     public func checkClientId() -> Bool {
-        guard let cliendId = requestHeaders["X-Client-Id"],
+        guard let cliendId = requestHeaders["x-client-id"],
             cliendId == ApiAction.ClientId else {
             makeErrorResponse(ApiAction.Error.clientIdMissing)
             return false
